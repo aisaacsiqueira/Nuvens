@@ -19,18 +19,23 @@ stopwords = nltk.corpus.stopwords.words('portuguese')
 
 discursos = pd.read_csv('discursos.csv')
 
-discursos = discursos.drop(['Unnamed: 0'],axis=1)
-discursos['processados'] = discursos['transcricao'].map(lambda x: x.lower())
-discursos['processados'] = discursos['processados'].map(lambda x: x[x.find(')'):] )
-discursos['processados'] = discursos['processados'].map(lambda x: re.sub('[0-9]',' ', x) )
-discursos['processados'] = discursos['processados'].map(lambda x: x.replace('sr. presidente',' '))
-discursos['processados'] = discursos['processados'].map(lambda x: x.replace('sr.',' '))
-discursos['processados'] = discursos['processados'].map(lambda x: x.replace('sra.',' '))
-discursos['processados'] = discursos['processados'].map(lambda x: x.replace('rio de janeiro','rio_de_janeiro'))
-discursos['processados'] = discursos['processados'].map(lambda x: x.replace('são paulo','são_paulo'))
+def pre_processa(discursos):
+    discursos = discursos.drop(['Unnamed: 0'],axis=1)
+    discursos['processados'] = discursos['transcricao'].map(lambda x: x.lower())
+    discursos['processados'] = discursos['processados'].map(lambda x: x[x.find(')'):] )
+    discursos['processados'] = discursos['processados'].map(lambda x: re.sub('[0-9]',' ', x) )
+    discursos['processados'] = discursos['processados'].map(lambda x: x.replace('sr. presidente',' '))
+    discursos['processados'] = discursos['processados'].map(lambda x: x.replace('sr.',' '))
+    discursos['processados'] = discursos['processados'].map(lambda x: x.replace('sra.',' '))
+    discursos['processados'] = discursos['processados'].map(lambda x: x.replace('rio de janeiro','rio_de_janeiro'))
+    discursos['processados'] = discursos['processados'].map(lambda x: x.replace('são paulo','são_paulo'))
+    
+    discursos['processados'] = discursos['processados'].map(lambda x: re.sub('[-]+', '', x))
+    discursos['processados'] = discursos['processados'].map(lambda x: re.sub(r"[\W]+", " ", x))
+    
+    return discursos
 
-discursos['processados'] = discursos['processados'].map(lambda x: re.sub('[-]+', '', x))
-discursos['processados'] = discursos['processados'].map(lambda x: re.sub(r"[\W]+", " ", x))
+discursos = pre_processa(discursos)
 
 agr = discursos.groupby(['deputado','partido'])['processados'].apply(lambda x: ' '.join(x))
 
