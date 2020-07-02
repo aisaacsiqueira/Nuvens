@@ -16,7 +16,7 @@ class Coleta(object):
     
     
     
-    def __init__(self,data_inicio='2020-01-01',data_fim=date.today(),deputado = None,partido=None,nome_arquivo='discursos'):
+    def __init__(self,data_inicio='2019-01-01',data_fim=date.today(),deputado = None,partido=None,nome_arquivo='discursos'):
         self.data_inicio = data_inicio
         self.data_fim = data_fim
         self.deputado = deputado
@@ -45,7 +45,7 @@ class Coleta(object):
         dicionario = json.loads(texto)
         dados = dicionario['dados']
         
-        
+        nome = ''
         
         for dado in dados:
                 
@@ -57,6 +57,8 @@ class Coleta(object):
             while True:
                 url = 'https://dadosabertos.camara.leg.br/api/v2/deputados/'+str(dado['id'])+'/discursos/'
                 parametro = {'dataInicio':self.data_inicio,'dataFim':self.data_fim,'itens':100,'pagina':pg}
+                # parametro = {'dataInicio':'2019-01-01','itens':100,'pagina':pg}
+
                 pg+=1
                 r2 = requests.get(url,params=parametro)
                 dicionario_d = json.loads(r2.text)
@@ -65,9 +67,12 @@ class Coleta(object):
                     break
                 
                 lista_dicionarios[nome].extend(dicionario_d)
-             
         
-        colunas = list(lista_dicionarios['Sâmia Bomfim'][1].keys()) + ['deputado','partido','id_deputado']
+        if self.deputado != None and len(lista_dicionarios[nome]) ==0:
+            return "Esse deputado não possui discursos no período especificado"
+            
+        
+        colunas = list(lista_dicionarios[nome][1].keys()) + ['deputado','partido','id_deputado']
         
         discursos = pd.DataFrame(columns= colunas)
         
@@ -93,8 +98,7 @@ class Coleta(object):
         discursos.to_csv(self.nome_arquivo+'.csv',columns=['dataHoraInicio','partido','id_deputado','deputado','transcricao'])
     
         return discursos
-    
-            
+
     #        for doc in dicionario_d:            
     #            print(nome,doc['valorDocumento'],doc['tipoDespesa']) 
     #            total+=doc['valorDocumento']

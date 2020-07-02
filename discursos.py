@@ -35,7 +35,8 @@ def pre_processa(discursos):
     discursos['processados'] = discursos['processados'].map(lambda x: x.replace('rio de janeiro','rio_de_janeiro'))
     discursos['processados'] = discursos['processados'].map(lambda x: x.replace('são paulo','são_paulo'))
     discursos['processados'] = discursos['processados'].map(lambda x: x.replace('fake news','fake_news'))
-    
+    discursos['processados'] = discursos['processados'].map(lambda x: x.replace('jair bolsonaro','jair_bolsonaro'))
+
     discursos['processados'] = discursos['processados'].map(lambda x: re.sub('[-]+', '', x))
     discursos['processados'] = discursos['processados'].map(lambda x: re.sub(r"[\W]+", " ", x))
     
